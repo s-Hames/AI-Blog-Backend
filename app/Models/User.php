@@ -7,10 +7,10 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Validator;
 use Laravel\Sanctum\HasApiTokens;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\ValidationException;
 
 /**
  * @property string $name
@@ -46,16 +46,18 @@ class User extends Authenticatable
 
     static function registerUser(array $inputData)
     {
+
         $data = Validator::make($inputData, [
             self::COLUMN_NAME => 'required|string|max:255',
             self::COLUMN_EMAIL => 'required|string|email|max:255|unique:users',
             self::COLUMN_PASSWORD => 'required|string|min:8',
         ])->validated();
 
+
         $model = new self();
         $model->name = $data[self::COLUMN_NAME] ?? "";
         $model->email = $data[self::COLUMN_EMAIL];
-        $model->password = Hash::make($inputData[self::COLUMN_PASSWORD]);
+        $model->password = Hash::make($data[self::COLUMN_PASSWORD]);
         $model->save();
         return $model;
 
