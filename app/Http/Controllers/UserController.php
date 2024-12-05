@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
@@ -22,7 +21,6 @@ class UserController extends Controller
             return response()->json(['errors' => $e->errors()], 422);
         }
     }
-
     public function login(Request $request)
     {
         $credentials = $request->validate([
@@ -35,5 +33,10 @@ class UserController extends Controller
         }
         $token = $user->createToken('auth_token')->plainTextToken;
         return response()->json(['token' => $token]);
+    }
+    public function logout(Request $request)
+    {
+        $request->user()->tokens()->delete();
+        return response()->json(['message' => 'Logged out']);
     }
 }
